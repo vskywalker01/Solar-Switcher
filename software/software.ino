@@ -32,7 +32,8 @@
 #define BUZZER_FREQUENCY          3500
 
 #define DISPLAY_REFRESH_RATE      100000
-#define BUTTON_RESOLUTION         200
+#define BUTTON_RESOLUTION         200000
+#define BUTTON_FAST_RESOLUTION    20000
 
 #define BUTTON_PRESSED_TONE       200
 #define ALARM_TONE                5000
@@ -59,7 +60,7 @@ bool blinkStatus;
 unsigned int secondCounter;
 unsigned int buttonCounter;
 unsigned short currentSubView;
-button pressedButton;
+button lastButton;
 
 void setup() {
   noInterrupts(); 
@@ -83,7 +84,6 @@ void setup() {
   blinkStatus=false;
   secondCounter=1000000/DISPLAY_REFRESH_RATE;
   buttonCounter=BUTTON_RESOLUTION/DISPLAY_REFRESH_RATE;
-  pressedButton=NONE;
 
   screen=new Display(LCD_SHIFT_EN, LCD_SHIFT_D7, LCD_SHIFT_SER, LCD_SHIFT_CLK,LCD_FORMAT_ROWS,LCD_FORMAT_COLS,LCD_MAX_COLS);
   options=new Settings();
@@ -148,16 +148,28 @@ void update() {
   }
 
   button detectedButton=NONE;
+  button pressedButton=NONE;
   if (!digitalRead(PLUS_BUTTON)) detectedButton=PLUS;
   if (!digitalRead(MINUS_BUTTON)) detectedButton=MINUS;
   if (!digitalRead(SELECT_BUTTON)) detectedButton=CONTROL;
-  if (detectedButton==pressedButton) {
-    if (buttonCounter>0) buttonCounter--;
-    else {
-      buttonCounter=BUTTON_RESOLUTION/DISPLAY_REFRESH_RATE;
+
+  if (buttonCounter>0) {
+    pressedButton=NONE;
+    buttonCounter--;
+  } else {
+    if (detectedButton!=NONE) {
       pressedButton=detectedButton;
+      
+      if (lastButton==detectedButton && detectedButton != CONTROL) {
+        buttonCounter=BUTTON_FAST_RESOLUTION/DISPLAY_REFRESH_RATE;
+      } else {
+        buttonCounter=BUTTON_RESOLUTION/DISPLAY_REFRESH_RATE;
+      }
+      
+      lastButton=detectedButton;
     }
   }
+  
   
   switch (currentView) {
     case GENERAL:
@@ -203,6 +215,7 @@ void update() {
           switch(counters->getDirection(0)) {
             case ON:
               screen->write(0,10,"ON ");
+              screen->write(1,0,"                    ");
               break;
             case STOP:
               screen->write(0,10,"ON ");
@@ -253,11 +266,11 @@ void update() {
         break;
       }
       if (currentSubView==0) {
-        screen->clear();
-        screen->write(0,0,"Maschere");
+        screen->write(0,0,"Maschere            ");
+        screen->write(1,0,"                    ");
       } else {
         screen->write(0,0,"Maschera carico "+String(currentSubView)+"     ");
-        screen->write(1,0,String((char) 0b00111110)+" ");
+        screen->write(1,0,String((char) 0b00111110)+"                   ");
         if (options->getMask(currentSubView-1)) {
           screen->write(1,2,String("ON "));
         } else {
@@ -295,11 +308,11 @@ void update() {
         break;
       }
       if (currentSubView==0) {
-        screen->clear();
         screen->write(0,0,"Potenza carichi     ");
+        screen->write(1,0,"                    ");
       } else {
         screen->write(0,0,"Potenza carico "+String(currentSubView)+"     ");
-        screen->write(1,0,String((char) 0b00111110)+" ");
+        screen->write(1,0,String((char) 0b00111110)+"                   ");
         screen->write(1,2,String(options->getPower(currentSubView-1))+"    ");
       }
     break;
@@ -318,9 +331,8 @@ void update() {
           currentView=SETTINGS_TIMEROFF;
         break;
       }
-      screen->clear();
-      screen->write(0,0,"Timer allaccio ");
-      screen->write(1,0,String((char) 0b00111110)+" ");
+      screen->write(0,0,"Timer allaccio      ");
+      screen->write(1,0,String((char) 0b00111110)+"                   ");
       screen->write(1,2,String(options->getTimerOn())+"    ");
     
     break;
@@ -336,12 +348,11 @@ void update() {
         break;
 
         case CONTROL:
-          currentView=SETTINGS_TIMEROFF;
+          currentView=SETTINGS_BUZZER;
         break;
       }
-      screen->clear();
-      screen->write(0,0,"Timer distacco ");
-      screen->write(1,0,String((char) 0b00111110)+" ");
+      screen->write(0,0,"Timer distacco      ");
+      screen->write(1,0,String((char) 0b00111110)+"                   ");
       screen->write(1,2,String(options->getTimerOff())+"    ");
     
     break;
@@ -359,20 +370,19 @@ void update() {
         case CONTROL:
           Timer1.stop();
           screen->clear();
-          delay(2000);
+          delay(5000);
           currentView=GENERAL;
           currentSubView=0;
           options->store(SETTINGS_ADDRESS);
           Timer1.start();
         break;
       }
-      screen->clear();
-      screen->write(0,0,"Avvisi sonori ");
-      screen->write(1,0,String((char) 0b00111110)+" ");
+      screen->write(0,0,"Avvisi sonori       ");
+      screen->write(1,0,String((char) 0b00111110)+"                   ");
       if (options->getBuzzer()) {
-        screen->write(1,2,"OFF    ");
+        screen->write(1,2,"OFF                ");
       } else {
-        screen->write(1,2,"ON     ");
+        screen->write(1,2,"ON                ");
       }
     
     break;
