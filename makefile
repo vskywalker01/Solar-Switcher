@@ -1,7 +1,7 @@
 PRJ = ./software 
 DEV = arduino:avr
 BRD = pro
-PORT = /dev/tty/ACM0 
+PORT = /dev/ttyUSB0 
 BAUD = 115200 
 
 compile: 
@@ -11,5 +11,5 @@ compile:
 	arduino-cli compile --fqbn $(DEV):$(BRD) $(PRJ)
 
 run: compile
-	arduino-cli upload -p $(PORT) --fqbn $(DEV):(BRD) $(PRJ)
+	arduino-cli upload -p $(PORT) --fqbn $(DEV):$(BRD) $(PRJ)
 
