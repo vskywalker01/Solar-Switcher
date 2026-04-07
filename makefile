@@ -8,6 +8,7 @@ compile:
 	arduino-cli core install $(DEV)
 	arduino-cli lib install ShiftLcd
 	arduino-cli lib install TimerOne
+	arduino-cli lib install Arduinothread
 	arduino-cli compile --fqbn $(DEV):$(BRD) $(PRJ)
 
 run: compile
