@@ -4,7 +4,6 @@
 #include "Arduino.h"
 #include <EEPROM.h>
 
-#define SETTINGS_CHECK_CHAR 0xAB
 #define DEFAULT_POWER       0
 #define LOADS_NUMBER        4
 #define DEFAULT_TIMEROFF    10
@@ -16,7 +15,7 @@
 using namespace std;
 
 typedef struct SettingsValues{
-    char errorCheck;
+    uint32_t checksum;
     unsigned int powers[LOADS_NUMBER];
     bool masks[LOADS_NUMBER];
 

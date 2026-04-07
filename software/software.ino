@@ -90,14 +90,35 @@ void setup() {
   light=new Sensor(PHOTO_PIN,PHOTO_BASEVALUE,PHOTO_INCREMENT);
   counters=new Relays(4);
   
-  options->loadSaved(SETTINGS_ADDRESS);
-
+  if(!options->loadSaved(SETTINGS_ADDRESS)) {
+    screen->clear();
+    screen->write(0,0,"Impostazioni non");
+    screen->write(1,0,"valide");
+    screen->update();
+    interrupts();
+    delay(2000);
+    noInterrupts();
+    screen->clear();
+  }
+  
   Timer1.initialize((DISPLAY_REFRESH_RATE/2));
   Timer1.attachInterrupt(update);
+
   interrupts(); 
 }
+bool changes;
+void loop() {
+  if (changes) {
+    noInterrupts();
+    tone(BUZZER_PIN,BUZZER_FREQUENCY,5000); 
+    changes=false;
+    interrupts();
+  }
+}
 
-void loop() {}
+void alert() {
+  if (options->getBuzzer()) tone(BUZZER_PIN,BUZZER_FREQUENCY,5000);
+}
 
 void update() {
   unsigned int currentPower=light->getCurrentPower();
@@ -110,7 +131,6 @@ void update() {
     counters->updateStatus();
 
     int leftPower=currentPower;
-    bool changes=false;
     for (int l=0;l<LOADS_NUMBER;l++) {
       if (!options->getMask(l)) {
         leftPower-=options->getPower(l);
@@ -166,11 +186,15 @@ void update() {
     case GENERAL:
       if (pressedButton==PLUS) currentSubView++;
       if (pressedButton==CONTROL) {
-        currentView=SETTINGS_POWER;
+        if (currentSubView==0) {  
+          currentView=SETTINGS_POWER;
+        } else {
+          currentSubView=0;
+        }
       }
       if (currentSubView==0) {
         screen->write(0,0,"Potenza:  ");
-        screen->write(0,10,String(currentPower)+"W    ");
+        screen->write(0,10,String(light->getCurrentPower())+"W    ");
         for (unsigned int l=0;l<LOADS_NUMBER ;l++) {
           switch (counters->getDirection(l)) {
             case ON:
@@ -188,6 +212,7 @@ void update() {
               }
             break;
             case START:
+              screen->write(1,(l*5),"OFF  ");
               if(blinkStatus) {
                 screen->write(1,3+(l*5),String((char) 0b00011110));
               } else {
@@ -203,7 +228,7 @@ void update() {
           currentView=GENERAL;
         } else {
           screen->write(0,0,"Porta "+String(currentSubView)+":            ");
-          switch(counters->getDirection(0)) {
+          switch(counters->getDirection(currentSubView-1)) {
             case ON:
               screen->write(0,10,"ON ");
               screen->write(1,0,"                    ");
@@ -359,13 +384,11 @@ void update() {
         break;
 
         case CONTROL:
-          Timer1.stop();
           screen->clear();
-          delay(5000);
+          screen->update();
           currentView=GENERAL;
           currentSubView=0;
           options->store(SETTINGS_ADDRESS);
-          Timer1.start();
         break;
       }
       screen->write(0,0,"Avvisi sonori       ");

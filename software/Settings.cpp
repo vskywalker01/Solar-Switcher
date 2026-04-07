@@ -7,23 +7,37 @@ Settings::Settings() {
     loadDefault();
 }
 
-bool Settings::loadSaved(unsigned int address) {
-    EEPROM.get(address,&values);
-    if (values.errorCheck!=SETTINGS_CHECK_CHAR) {
-        loadDefault();
-        return false;;
+bool Settings::loadSaved(unsigned int address) {  
+    EEPROM.get(address,values);
+    uint16_t checksum = 0;
+    for (unsigned int i=0;i<LOADS_NUMBER;i++) {
+        checksum += (uint32_t) values.powers[i];
+        checksum += (uint32_t) values.masks[i];
     }
+    checksum += (uint32_t) values.defaultTimerOff; 
+    checksum += (uint32_t) values.defaultTimerOn; 
+    checksum += (uint32_t) values.buzzer;
+    if (checksum != values.checksum) {
+        loadDefault();
+        return false; 
+    } 
     return true;
 }
 
 void Settings::store(unsigned int address) {
-    if (values.errorCheck==SETTINGS_CHECK_CHAR) {
-        EEPROM.put(address,&values);
+    uint16_t checksum = 0;
+    for (unsigned int i=0;i<LOADS_NUMBER;i++) {
+        checksum += (uint32_t) values.powers[i];
+        checksum += (uint32_t) values.masks[i];
     }
+    checksum += (uint32_t) values.defaultTimerOff; 
+    checksum += (uint32_t) values.defaultTimerOn; 
+    checksum += (uint32_t) values.buzzer;
+    values.checksum=checksum;
+    EEPROM.put(address,values);
 }
 
 void Settings::loadDefault() {
-    values.errorCheck=SETTINGS_CHECK_CHAR;
     for (unsigned int n=0;n<LOADS_NUMBER;n++) {
       values.powers[n]=DEFAULT_POWER;
       values.masks[n]=false;

@@ -8,6 +8,5 @@ Sensor::Sensor(int pin, unsigned int base, unsigned int increment) {
 }
 
 unsigned int Sensor::getCurrentPower() {
-    return 0;
     return b+(digitalRead(sensorPin)*c);
 }

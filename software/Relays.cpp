@@ -38,7 +38,7 @@ void Relays::updateStatus() {
         switch (status[r]) {
             case START:
                 if (counters[r]>0) {
-                    counters--;
+                    counters[r]--;
                 } else {
                     status[r]=ON;
                     changedFlags[r]=true;
@@ -46,7 +46,7 @@ void Relays::updateStatus() {
             break;
             case STOP:
                 if (counters[r]>0) {
-                    counters--;
+                    counters[r]--;
                 } else {
                     status[r]=OFF;
                     changedFlags[r]=true;
