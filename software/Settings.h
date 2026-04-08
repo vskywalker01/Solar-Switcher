@@ -21,14 +21,12 @@ typedef struct SettingsValues{
 
     unsigned int defaultTimerOff;
     unsigned int defaultTimerOn;
-
-    bool buzzer;
 } SettingsValues;
 
 class Settings {
     private: 
     SettingsValues values;
-
+    SettingsValues pendingValues; 
     public:
     Settings();
     
@@ -39,14 +37,12 @@ class Settings {
     void setPower(unsigned int load, unsigned int value);
     void setTimerOn(unsigned int value);
     void setTimerOff(unsigned int value);
-    void setBuzzer(bool value);
     void setMask(unsigned int load, bool value);
     
 
     unsigned int getPower(unsigned int load);
     unsigned int getTimerOn();
     unsigned int getTimerOff();
-    bool getBuzzer();
     bool getMask(unsigned int load);
 
 };

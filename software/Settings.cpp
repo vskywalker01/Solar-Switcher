@@ -9,6 +9,7 @@ Settings::Settings() {
 
 bool Settings::loadSaved(unsigned int address) {  
     EEPROM.get(address,values);
+    EEPROM.get(address,pendingValues);
     uint16_t checksum = 0;
     for (unsigned int i=0;i<LOADS_NUMBER;i++) {
         checksum += (uint32_t) values.powers[i];
@@ -16,7 +17,6 @@ bool Settings::loadSaved(unsigned int address) {
     }
     checksum += (uint32_t) values.defaultTimerOff; 
     checksum += (uint32_t) values.defaultTimerOn; 
-    checksum += (uint32_t) values.buzzer;
     if (checksum != values.checksum) {
         loadDefault();
         return false; 
@@ -25,6 +25,13 @@ bool Settings::loadSaved(unsigned int address) {
 }
 
 void Settings::store(unsigned int address) {
+    for (unsigned int i=0;i<LOADS_NUMBER;i++) {
+        values.powers[i]=pendingValues.powers[i];
+        values.masks[i]=pendingValues.masks[i];
+    }
+    values.defaultTimerOff=pendingValues.defaultTimerOff; 
+    values.defaultTimerOn=pendingValues.defaultTimerOn; 
+
     uint16_t checksum = 0;
     for (unsigned int i=0;i<LOADS_NUMBER;i++) {
         checksum += (uint32_t) values.powers[i];
@@ -32,35 +39,37 @@ void Settings::store(unsigned int address) {
     }
     checksum += (uint32_t) values.defaultTimerOff; 
     checksum += (uint32_t) values.defaultTimerOn; 
-    checksum += (uint32_t) values.buzzer;
+    
     values.checksum=checksum;
+    pendingValues.checksum=checksum;
     EEPROM.put(address,values);
 }
 
 void Settings::loadDefault() {
     for (unsigned int n=0;n<LOADS_NUMBER;n++) {
       values.powers[n]=DEFAULT_POWER;
-      values.masks[n]=false;
+      values.masks[n]=true;
+
+      pendingValues.powers[n]=DEFAULT_POWER; 
+      pendingValues.masks[n]=false; 
     }
     values.defaultTimerOff=DEFAULT_TIMEROFF;
     values.defaultTimerOn=DEFAULT_TIMERON;
-    values.buzzer=DEFAULT_BUZZER;
+    pendingValues.defaultTimerOff=DEFAULT_TIMEROFF;
+    pendingValues.defaultTimerOn=DEFAULT_TIMERON;
 }
 
 void Settings::setPower(unsigned int load,unsigned int value) {
     if (value<MAX_SETTINGS_BOUND && load<LOADS_NUMBER) {
-        values.powers[load]=value;
+        pendingValues.powers[load]=value;
     }
 }
 
 void Settings::setTimerOn(unsigned int value) {
-    values.defaultTimerOn=value;
+    pendingValues.defaultTimerOn=value;
 }
 void Settings::setTimerOff(unsigned int value) {
-    values.defaultTimerOff=value;
-}
-void Settings::setBuzzer(bool value) {
-    values.buzzer=value;
+    pendingValues.defaultTimerOff=value;
 }
 
 unsigned int Settings::getPower(unsigned int load) {
@@ -75,14 +84,10 @@ unsigned int Settings::getTimerOn() {
 unsigned int Settings::getTimerOff() {
     return values.defaultTimerOff;
 }
-bool Settings::getBuzzer() {
-    return values.buzzer;
-}
-
 
 void Settings::setMask(unsigned int load,bool value) {
     if (load<LOADS_NUMBER) {
-        values.masks[load]=value;
+        pendingValues.masks[load]=value;
     }
 }
 
