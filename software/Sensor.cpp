@@ -8,7 +8,7 @@ Sensor::Sensor(int pin, float alpha, float beta) {
 }
 
 unsigned int Sensor::getCurrentPower() {
-    return (unsigned int) (a*pow(digitalRead(sensorPin),b));
+    return (unsigned int) (a*pow(analogRead(sensorPin),b));
 }
 
 float Sensor::getAlpha() {

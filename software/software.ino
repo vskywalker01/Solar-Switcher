@@ -172,8 +172,9 @@ void update() {
         }
       }
       if (currentSubView==0) {
-        screen->write(0,0,"Potenza:  ");
-        screen->write(0,10,String(light->getCurrentPower())+"W    ");
+        screen->write(0,0,"Sole:                ");
+        screen->write(0,6,String(light->getCurrentPower())+"W    ");
+
         for (unsigned int l=0;l<LOADS_NUMBER ;l++) {
           switch (counters->getDirection(l)) {
             case ON:
@@ -364,11 +365,12 @@ void update() {
             break; 
             case 1: 
                 options->setAlpha(options->getAlpha()+SENSOR_ALPHA_DELTA);
+                light->setAlpha(options->getAlpha());
             break;
             case 2: 
-                options->setAlpha(options->getBeta()+SENSOR_BETA_DELTA);
+                options->setBeta(options->getBeta()+SENSOR_BETA_DELTA);
+                light->setBeta(options->getBeta());
             default: 
-                currentSubView=0;
             break;
           }
         break;
@@ -380,11 +382,12 @@ void update() {
             break; 
             case 1: 
                 options->setAlpha(options->getAlpha()-SENSOR_ALPHA_DELTA);
+                light->setAlpha(options->getAlpha());
             break;
             case 2: 
-                options->setAlpha(options->getBeta()-SENSOR_BETA_DELTA);
+                options->setBeta(options->getBeta()-SENSOR_BETA_DELTA);
+                light->setBeta(options->getBeta());
             default: 
-                currentSubView=0;
             break;
           }  
         break;
