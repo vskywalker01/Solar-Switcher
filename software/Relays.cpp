@@ -4,6 +4,8 @@
 Relays::Relays(unsigned int relays) {
     if (relays==0) return;
     number=relays;
+    
+    //Array initialization for the counter status and values (the counters are setted as OFF)
     counters= new unsigned int [number];
     status= new counterStatus [number];
     changedFlags= new bool[number];
@@ -38,16 +40,20 @@ void Relays::updateStatus() {
         switch (status[r]) {
             case START:
                 if (counters[r]>1) {
+                    // is the selected counter has a value greater than one -> decrement the counter 
                     counters[r]--;
                 } else {
+                    //it the counter reaches zero and the revious state vas START -> new status is ON; 
                     status[r]=ON;
                     changedFlags[r]=true;
                 }
             break;
             case STOP:
                 if (counters[r]>1) {
+                    // if the counter has a value greater than one -> decrement 
                     counters[r]--;
                 } else {
+                    // if the counter has a value equal to 0 and the previous status was STOP -> new status is OFF; 
                     status[r]=OFF;
                     changedFlags[r]=true;
                 }

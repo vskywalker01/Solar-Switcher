@@ -1,3 +1,5 @@
+// Implementation of main program 
+
 #include "Display.h"
 #include "Settings.h"
 #include "Sensor.h"
@@ -5,7 +7,9 @@
 
 #include <TimerOne.h>
 
-#define LCD_SHIFT_EN              4
+
+
+#define LCD_SHIFT_EN              4 
 #define LCD_SHIFT_D7              5
 #define LCD_SHIFT_SER             6
 #define LCD_SHIFT_CLK             7
@@ -173,8 +177,8 @@ void update() {
       }
       if (currentSubView==0) {
         screen->write(0,0,"Sole:                ");
-        screen->write(0,6,String(light->getCurrentPower())+"W    ");
-
+        screen->write(0,6,String(light->getCurrentValue())+"     ");
+        screen->write(0,12,String(light->getCurrentValue())+"W   ");
         for (unsigned int l=0;l<LOADS_NUMBER ;l++) {
           switch (counters->getDirection(l)) {
             case ON:
