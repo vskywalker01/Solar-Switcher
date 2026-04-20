@@ -6,7 +6,7 @@
 #include "Arduino.h"
 #include <math.h>
 
-#define SAMPLES     20
+#define SAMPLES     50
 
 // The class implements methods for collecting data from the light sensor. It automatically performs an average with past samples in order to remove outlayers. 
 // It implements also a function that convers the samples into usable power in Watts (useful in the main program for understanding wich devices should be activated)

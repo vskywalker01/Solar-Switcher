@@ -65,13 +65,13 @@ The estimation of the available power is performes using an exponential model (s
 #define LCD_MAX_COLS              38
 
 //settings EEPROM base address
-#define SETTINGS_ADDRESS          0
+#define SETTINGS_ADDRESS          0x01
 
 //Sensor pin and constants 
 #define PHOTO_PIN                 A0
 #define SENSOR_ALPHA_DELTA        0.1
 #define SENSOR_BETA_DELTA         0.1
-
+#define POWER_DELTA               10
 //Button pins 
 #define SELECT_BUTTON             2
 #define MINUS_BUTTON              8
@@ -266,7 +266,7 @@ void update() {
       if (currentSubView==0) {
         screen->write(0,0,"Sole:                ");
         screen->write(0,6,String(light->getCurrentValue())+"     ");
-        screen->write(0,12,String(light->getCurrentValue())+"W   ");
+        screen->write(0,12,String((char) 0b00010000)+String(light->getCurrentPower())+"W   ");
         for (unsigned int l=0;l<LOADS_NUMBER ;l++) {
           switch (counters->getDirection(l)) {
             case ON:
@@ -372,12 +372,12 @@ void update() {
       switch (pressedButton) {
         case PLUS:
           if (currentSubView==0) currentSubView=1;
-          else if (currentSubView<=LOADS_NUMBER) options->setPower((currentSubView-1),options->getPower(currentSubView-1)+1);
+          else if (currentSubView<=LOADS_NUMBER) options->setPower((currentSubView-1),options->getPower(currentSubView-1)+POWER_DELTA);
         break;
 
         case MINUS:
           if (currentSubView==0) currentSubView=1;
-          else if (currentSubView<=LOADS_NUMBER) options->setPower((currentSubView-1),options->getPower(currentSubView-1)-1);
+          else if (currentSubView<=LOADS_NUMBER) options->setPower((currentSubView-1),options->getPower(currentSubView-1)-POWER_DELTA);
         break;
 
         case CONTROL:
