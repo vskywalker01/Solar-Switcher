@@ -49,9 +49,9 @@ void Settings::loadDefault() {
     }
     values.defaultTimerOff=DEFAULT_TIMEROFF;
     values.defaultTimerOn=DEFAULT_TIMERON;
-    values.alpha=0;
-    values.beta=0;
-    values.gamma=0;
+    values.alpha=DEFAULT_ALPHA;
+    values.beta=DEFAULT_BETA;
+    values.gamma=DEFAULT_GAMMA;
 }
 
 void Settings::setPower(unsigned int load,unsigned int value) {

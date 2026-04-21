@@ -69,9 +69,9 @@ The estimation of the available power is performes using an exponential model (s
 
 //Sensor pin and constants 
 #define PHOTO_PIN                 A0
-#define SENSOR_ALPHA_DELTA        0.01
+#define SENSOR_ALPHA_DELTA        1
 #define SENSOR_BETA_DELTA         0.1
-#define SENSOR_GAMMA_DELTA        10
+#define SENSOR_GAMMA_DELTA        1
 #define POWER_DELTA               10
 //Button pins 
 #define SELECT_BUTTON             2

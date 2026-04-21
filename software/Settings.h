@@ -10,6 +10,10 @@
 #define DEFAULT_TIMERON     10
 #define DEFAULT_BUZZER      true 
 
+#define DEFAULT_ALPHA       966 
+#define DEFAULT_BETA        9.6 
+#define DEFAULT_GAMMA       0
+
 #define MAX_SETTINGS_BOUND  65536
 
 using namespace std;
