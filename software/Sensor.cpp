@@ -14,13 +14,11 @@ Sensor::Sensor(int pin, float alpha, float beta, float gamma) {
     }
 }
 
-// a -> 366 
-// c -> 0 
-// b -> 9.6 
 
 unsigned int Sensor::getCurrentPower() {
     //returning the power from the function. 
     float value = getCurrentValue(); 
+    //computing power function using coefficients
     if (value < g) return 0; 
     return (unsigned int) pow((value-g)/a,b);
 }

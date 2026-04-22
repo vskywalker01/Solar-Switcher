@@ -242,7 +242,7 @@ void update() {
   if (!digitalRead(MINUS_BUTTON)) pressedButton=MINUS;
   if (!digitalRead(SELECT_BUTTON)) pressedButton=CONTROL;
   
-  //if the button is pressed and the button counter is off, the cutton counter is setted. 
+  //if the button is pressed and the button counter is off, the button counter is setted. 
   if (buttonCounter==0 || pressedButton != lastButton) {
     //if the last valid button is equal to the pressed one, the polling rate is increased 
     if (lastButton!=pressedButton) buttonCounter=BUTTON_RESOLUTION/DISPLAY_REFRESH_RATE;
@@ -257,19 +257,26 @@ void update() {
   /* interface management */ 
   switch (currentView) {
     case GENERAL:
+      //If PLUS button is pressed -> go to the next detail page  
       if (pressedButton==PLUS) currentSubView++;
+
+      //If CONTROL button is pressed -> go to the settings page 
       if (pressedButton==CONTROL) {
         if (currentSubView==0) {  
           currentView=SETTINGS_POWER;
         } else {
+          //If it is pressed in a detail page -> return to the general view 
           currentSubView=0;
         }
       }
       if (currentSubView==0) {
+        //Printing power and light values on the first row 
         screen->write(0,0,"Sole:                ");
         screen->write(0,6,String(currentLight)+"     ");
         screen->write(0,11,String((char) 0b00010000)+" ");
         screen->write(0,13,String(currentPower)+"W   ");
+
+        //Printing relay status on the second row 
         for (unsigned int l=0;l<LOADS_NUMBER ;l++) {
           switch (counters->getDirection(l)) {
             case ON:
@@ -298,11 +305,16 @@ void update() {
         }
 
       } else {
+        //Details views shows a single relay status. 
         if (currentSubView>LOADS_NUMBER) {
           currentSubView=0;
           currentView=GENERAL;
         } else {
+
+          //Printing the current relay Id and status in the first row and the countdown in the second row (if started) 
           screen->write(0,0,"Porta "+String(currentSubView)+":            ");
+
+          
           switch(counters->getDirection(currentSubView-1)) {
             case ON:
               screen->write(0,10,"ON ");
@@ -315,6 +327,7 @@ void update() {
             
             case OFF:
               screen->write(0,10,"OFF");
+              //If the relay is masked, prints "masked in the second row"
               if (options->getMask(currentSubView-1)) {
                 screen->write(1,0,"Mascherato          ");
               } else {

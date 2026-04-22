@@ -34,15 +34,19 @@ class Sensor {
     Sensor(int pin,float alpha,float beta, float gamma);
     void readSample(); 
     /* getCurrentPower() returns the usable power from the average of samples collected using getCurrentValue(). 
-     * It uses an exponential funciton based on alpha and beta values, where alpha is a multiplicative factor and beta is the exponent factor. 
-     * Power = a * (samples)^b 
-     */ 
+     * It uses a power based on alpha, beta and gamma values estimated empirically by observing how the power distribution is related to differences from measurements in the analog pin. 
+     * Power = ((value - g)/a)^b
+     * for example: 
+     * a -> 366 
+     * g -> 0 
+     * b -> 9.6 
+    */ 
     unsigned int getCurrentPower();
 
     /* get current value reads a sample from the sensor pin, stores it in the samples array and calculates an average of all samples stored. */ 
     unsigned int getCurrentValue();
     
-    /* function used for setting and getting the function parameters */ 
+    /* functions used for setting and getting the coefficients*/ 
     float getAlpha();
     float getBeta();
     float getGamma();

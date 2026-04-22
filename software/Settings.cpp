@@ -94,14 +94,14 @@ bool Settings::getMask(unsigned int load) {
 }
 
 void Settings::setAlpha(float alpha) {
-    if (alpha>=0) values.alpha=alpha; 
+    if (alpha>0) values.alpha=alpha; 
 }
 void Settings::setBeta(float beta) {
-    if (beta>=0) values.beta=beta;
+    if (beta>0) values.beta=beta;
 }
 
 void Settings::setGamma(float gamma) {
-    if (gamma>=0) values.gamma=gamma;
+    values.gamma=gamma;
 }
 
 float Settings::getAlpha() {
