@@ -200,10 +200,8 @@ void update() {
         switch (counters->getDirection(l)) {
           case STOP:
             //if relay is turning off but there is enough light -> the relay is maintained on 
-            if (leftPower >= options->getPower(l)) {
-              leftPower-=options->getPower(l);
-              counters->setCount(l,0,ON);
-            }
+            if (leftPower >= options->getPower(l)) counters->setCount(l,0,ON);
+            
           break;
           case START:
             //if the relay is turning on but there is not enough light -> the relay is maintained off 
@@ -215,11 +213,12 @@ void update() {
           break;
           case OFF:
             //if the relay is off but there is enough light -> the relay counter is started to activate the relay 
-            if (leftPower >= options->getPower(l)) {
-              leftPower-=options->getPower(l);
-              counters->setCount(l,options->getTimerOn(),START);
-            }
+            if (leftPower >= options->getPower(l)) counters->setCount(l,options->getTimerOn(),START);
+          
           break;
+        }
+        if (leftPower >= options->getPower(l)) {
+            leftPower-=options->getPower(l);         
         }
       } else {
         //if the device is masked, its priority is ignored and the relay remains off.
